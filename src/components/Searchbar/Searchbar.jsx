@@ -11,32 +11,32 @@ export default class Searchbar extends Component {
   };
 
   state = {
-    query: '',
+    searchQuery: '',
   };
 
   handleSearchChange = event => {
     this.setState({
-      query: event.currentTarget.value,
+      searchQuery: event.currentTarget.value,
     });
   };
 
   handleSubmit = event => {
     event.preventDefault();
-    const { query } = this.state;
+    const { searchQuery } = this.state;
     const { onSubmit } = this.props;
-    const normalizedQuery = query.toLowerCase().trim();
+    const normalizedQuery = searchQuery.toLowerCase().trim();
 
     if (normalizedQuery === '') {
       toast.error('Please enter images to find');
       return;
     }
-
     onSubmit(normalizedQuery);
-    // this.setState({ query: '' });
+    // this.setState({ searchQuery: '' });
   };
 
   render() {
     const { isLoading } = this.props;
+    const { searchQuery } = this.state;
     return (
       <header className="Searchbar">
         <form className="SearchForm" onSubmit={this.handleSubmit}>
@@ -55,7 +55,7 @@ export default class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            value={this.state.query}
+            value={searchQuery}
             onChange={this.handleSearchChange}
             maxLength={30}
           />

@@ -30,6 +30,7 @@ export default class App extends Component {
 
   async componentDidUpdate(_, prevState) {
     const { query, page, images, idToScroll } = this.state;
+
     if (images.length > API.PER_PAGE && idToScroll) {
       const elem = document.getElementById(idToScroll);
       elem.scrollIntoView({
@@ -44,11 +45,16 @@ export default class App extends Component {
 
       try {
         const { hits, totalHits } = await API.fetchImages(query, page);
+        if (hits.length === 0) {
+          toast.error(
+            'No images found with this name, please try another name'
+          );
+        }
         this.setState(prevState => ({
           images: [...prevState.images, ...hits],
           loadMore: totalHits / API.PER_PAGE > page,
           status: STATUS.success,
-          idToScroll: hits[0].id,
+          idToScroll: hits.length ? hits[0].id : null,
         }));
       } catch (error) {
         console.log(error);
@@ -57,13 +63,24 @@ export default class App extends Component {
     }
   }
 
-  handleSearchbarSubmit = query => {
-    if (query === this.state.query) {
+  handleSearchbarSubmit = searchQuery => {
+    const { query, images } = this.state;
+    if (searchQuery === query && images.length === 0) {
+      toast.error('No images found with this name, please try another name');
+    }
+
+    if (searchQuery === query && images.length) {
       return toast.error(
         'These images are already shown, please enter another image name'
       );
     }
-    this.setState({ query, page: 1, images: [], largeImageURL: '' });
+
+    this.setState({
+      query: searchQuery,
+      page: 1,
+      images: [],
+      largeImageURL: '',
+    });
   };
 
   handleLoadMoreBtnClick = () => {
